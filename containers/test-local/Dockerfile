@@ -1,10 +1,5 @@
 FROM docker.io/library/rockylinux:8 AS builder
 
-RUN yum install -y maven
-
-COPY rpm-builder-test /usr/src/rpm-builder-test
-RUN find /usr/src/rpm-builder-test
-
 RUN mkdir /tmp/import-keys
 
 COPY private.key /tmp/import-keys
@@ -24,18 +19,13 @@ RUN true \
     && gpg --batch --passphrase rpmbuildertest --pinentry-mode loopback --export-secret-keys > secring.gpg \
     && gpg --show-keys secring.gpg
 
-#RUN --mount=type=cache,target=/root/.m2,z \
-RUN \
-    true \
-    && mvn -f /usr/src/rpm-builder-test package rpm:rpm
-
-RUN cp /usr/src/rpm-builder-test/target/*.rpm /test.rpm
+COPY rpm-builder-test/target/rpm-builder-test-1.0-SNAPSHOT.noarch.rpm /test.rpm
 
 RUN rpm -qvi /test.rpm
 
 # now create the YUM repository
 
-RUN yum -y install createrepo_c
+RUN yum -y install createrepo_c findutils
 
 RUN true \
     && mkdir /myrepo \
@@ -52,7 +42,6 @@ COPY test.repo /etc/yum.repos.d/test.repo
 RUN ls /etc/yum.repos.d/
 
 COPY --from=builder /myrepo/ /myrepo/
-RUN find /myrepo
 
 RUN yum repo-pkgs test list || true
 
@@ -69,7 +58,6 @@ COPY test.repo /etc/yum.repos.d/test.repo
 RUN ls /etc/yum.repos.d/
 
 COPY --from=builder /myrepo/ /myrepo/
-RUN find /myrepo
 
 RUN yum repo-pkgs test list || true
 
@@ -86,7 +74,6 @@ COPY test.repo /etc/yum.repos.d/test.repo
 RUN ls /etc/yum.repos.d/
 
 COPY --from=builder /myrepo/ /myrepo/
-RUN find /myrepo
 
 RUN yum repo-pkgs test list || true
 

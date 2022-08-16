@@ -11,6 +11,8 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <keyringFile>${user.home}/.gnupg/secring.gpg</keyringFile>
+        <rpm-builder.version>1.8.0</rpm-builder.version>
     </properties>
 
     <build>
@@ -18,13 +20,13 @@
             <plugin>
                 <groupId>de.dentrassi.maven</groupId>
                 <artifactId>rpm</artifactId>
-                <version>1.8.0</version>
+                <version>${rpm-builder.version}</version>
                 <configuration>
                     <outputFileName>${artifactId}-${version}.noarch.rpm</outputFileName>
                     <signature>
                         <keyId>50F70A74FA569ADE</keyId>
                         <keyringFile>
-                            ${user.home}/.gnupg/secring.gpg
+                            ${keyringFile}
                         </keyringFile>
                         <passphrase>rpmbuildertest</passphrase>
                         <hashAlgorithm>SHA256</hashAlgorithm>
