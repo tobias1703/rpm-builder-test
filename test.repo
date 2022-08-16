@@ -1,0 +1,5 @@
+[test]
+name=test
+baseurl=file:/myrepo
+enabled=1
+gpgcheck=1
